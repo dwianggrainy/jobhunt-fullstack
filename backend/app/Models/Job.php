@@ -6,6 +6,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class Job extends Model
 {
+    public $timestamps = false;
+
     protected $fillable = [
         'recruiter_id',
         'title',
