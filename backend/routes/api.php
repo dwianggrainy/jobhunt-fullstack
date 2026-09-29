@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\JobController;
+use App\Http\Controllers\ApplicationController;
 
 Route::prefix('auth')->group(function () {
     Route::post('/register', [AuthController::class, 'register']);
@@ -23,3 +24,7 @@ Route::middleware(['auth:sanctum', 'role:recruiter'])->group(function () {
 
 Route::get('/jobs', [JobController::class, 'index']);
 Route::get('/jobs/{id}', [JobController::class, 'show']);
+
+Route::middleware(['auth:sanctum', 'role:job_seeker'])->group(function () {
+    Route::post('/jobs/{id}/apply', [ApplicationController::class, 'apply']);
+});
