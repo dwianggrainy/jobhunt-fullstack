@@ -32,8 +32,6 @@ class StoreJobRequest extends FormRequest
             'salary_min' =>['nullable','integer'],
             'salary_max' =>['nullable','integer'],
             'is_active' =>['boolean'],
-
-
         ];
     }
 }

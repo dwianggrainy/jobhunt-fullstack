@@ -37,7 +37,7 @@ class ApplicationController extends Controller
             ], 409);
         }
 
-        $apply = Application::create([
+        $application = Application::create([
             'job_id' => $job->id,
             'applicant_id' => $request->user()->id,
             'cover_letter' => $validatedData['cover_letter'] ?? null,
@@ -45,7 +45,16 @@ class ApplicationController extends Controller
 
         return response()->json([
             'message' => 'Lamaran berhasil dikirim',
-            'application' => $apply
+            'application' => $application
         ],201);
+    }
+
+    public function mine(Request $request)
+    {
+        $applications = Application::with('job')->where('applicant_id',$request->user()->id)->get();
+
+        return response()->json([
+            'applications' =>$applications
+        ],200);
     }
 }

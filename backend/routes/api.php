@@ -27,4 +27,5 @@ Route::get('/jobs/{id}', [JobController::class, 'show']);
 
 Route::middleware(['auth:sanctum', 'role:job_seeker'])->group(function () {
     Route::post('/jobs/{id}/apply', [ApplicationController::class, 'apply']);
+    Route::get('/applications/mine', [ApplicationController::class, 'mine']);
 });
