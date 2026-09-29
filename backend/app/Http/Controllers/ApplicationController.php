@@ -6,7 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\Application;
 use App\Models\Job;
 use App\Http\Requests\ApplyJobRequest;
-use GuzzleHttp\Promise\Create;
+use App\Http\Requests\UpdateApplicationStatusRequest;
 
 class ApplicationController extends Controller
 {
@@ -56,5 +56,64 @@ class ApplicationController extends Controller
         return response()->json([
             'applications' =>$applications
         ],200);
+    }
+
+    public function applicants(Request $request, $id)
+    {
+        $job=Job::find($id);
+        if(!$job) {
+            return response()->json([
+                'message' => 'Job tidak ditemukan'
+            ],404);
+        }
+
+        if ($job->recruiter_id !== $request->user()->id) {
+            return response()->json([
+                'message' => 'Unauthorized'
+            ], 403);
+        }
+
+        $applications = Application::with('applicant')->where('job_id', $job->id)->get();
+
+        return response()->json([
+            'applications' => $applications
+        ], 200);
+
+    }
+
+    public function updateStatus(UpdateApplicationStatusRequest $request, $id)
+    {
+        $application = Application::find($id);
+
+        if (!$application) {
+            return response()->json([
+                'message' => 'Lamaran tidak ditemukan'
+            ], 404);
+        }
+
+        $job = Job::find($application->job_id);
+
+        if (!$job) {
+            return response()->json([
+                'message' => 'Job tidak ditemukan'
+            ], 404);
+        }
+
+        if ($job->recruiter_id !== $request->user()->id) {
+            return response()->json([
+                'message' => 'Unauthorized'
+            ], 403);
+        }
+
+        $validatedData = $request->validated();
+
+        $application->update([
+            'status' => $validatedData['status'],
+        ]);
+
+        return response()->json([
+            'message' => 'Status lamaran berhasil diperbarui',
+            'application' => $application
+        ], 200);
     }
 }

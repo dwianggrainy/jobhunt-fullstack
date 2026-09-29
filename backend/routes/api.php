@@ -20,6 +20,8 @@ Route::middleware(['auth:sanctum', 'role:recruiter'])->group(function () {
     Route::get('/jobs/mine', [JobController::class, 'mine']);
     Route::put('/jobs/{id}', [JobController::class, 'update']);
     Route::delete('/jobs/{id}', [JobController::class, 'destroy']);
+    Route::get('/jobs/{id}/applicants', [ApplicationController::class, 'applicants']);
+    Route::patch('/applications/{id}/status', [ApplicationController::class, 'updateStatus']);
 });
 
 Route::get('/jobs', [JobController::class, 'index']);
