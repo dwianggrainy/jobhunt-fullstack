@@ -9,13 +9,47 @@ use App\Http\Requests\UpdateJobRequest;
 
 class JobController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $jobs=Job::all();
+        $query = Job::withCount('applications');
+
+        $search = $request->query('search');
+
+        if ($search) {
+            $query->where(function ($q) use ($search) {
+                $q->where('title', 'like', "%{$search}%")
+                  ->orWhere('company', 'like', "%{$search}%");
+            });
+        }
+
+        $type = $request->query('type');
+
+        if ($type) {
+            $query->where('type', $type);
+        }
+
+        $location = $request->query('location');
+
+        if ($location) {
+            $query->where('location', 'like', "%{$location}%");
+        }
+
+        $sort = $request->query('sort');
+
+        if ($sort === 'newest') {
+            $query->orderBy('created_at', 'desc');
+        }
+
+        if ($sort === 'most_applicants') {
+            $query->orderBy('applications_count', 'desc');
+        }
+
+        $jobs = $query->paginate(10);
 
         return response()->json([
-            'jobs'=>$jobs
+            'jobs' => $jobs
         ], 200);
+
     }
 
     public function store(StoreJobRequest $request)
