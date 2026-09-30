@@ -34,6 +34,18 @@ class JobController extends Controller
             $query->where('location', 'like', "%{$location}%");
         }
 
+        $salaryMin = $request->query('salary_min');
+
+        if ($salaryMin) {
+            $query->where('salary_max', '>=', $salaryMin);
+        }
+
+        $salaryMax = $request->query('salary_max');
+
+        if ($salaryMax) {
+            $query->where('salary_min', '<=', $salaryMax);
+        }
+
         $sort = $request->query('sort');
 
         if ($sort === 'newest') {
