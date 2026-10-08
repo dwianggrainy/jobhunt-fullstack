@@ -4,18 +4,33 @@ import { applyJob } from "../../services/applicationService";
 
 function ApplyForm({ jobId }) {
   const [coverLetter, setCoverLetter] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [success, setSuccess] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
 
   const handleSubmit = async (event) => {
     event.preventDefault();
 
+    // Jangan kirim lagi kalau sedang loading
+    if (loading || success) return;
+
     try {
+      setLoading(true);
+      setErrorMessage("");
+
       const data = await applyJob(jobId, {
         cover_letter: coverLetter,
       });
 
       console.log("Lamaran berhasil:", data);
+
+      setSuccess(true);
     } catch (error) {
       console.error("Gagal mengirim lamaran:", error);
+
+      setErrorMessage(error.response?.data?.message || "Gagal mengirim lamaran. Silakan coba lagi.");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -44,9 +59,15 @@ function ApplyForm({ jobId }) {
         />
       </div>
 
+      {/* Pesan sukses */}
+      {success && <div className="mt-4 rounded-xl border border-green-200 bg-green-50 px-4 py-3 text-sm font-medium text-green-700">✓ Lamaran berhasil dikirim!</div>}
+
+      {/* Pesan error */}
+      {errorMessage && <div className="mt-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-600">{errorMessage}</div>}
+
       <div className="mt-5 flex justify-end">
-        <Button type="submit" className="bg-blue-600 px-6 py-2.5 hover:bg-blue-500">
-          Kirim Lamaran
+        <Button type="submit" disabled={loading || success} className={`px-6 py-2.5 ${success ? "cursor-not-allowed bg-green-600" : "bg-blue-600 hover:bg-blue-500"}`}>
+          {loading ? "Mengirim..." : success ? "Lamaran Terkirim ✓" : "Kirim Lamaran"}
         </Button>
       </div>
     </form>
